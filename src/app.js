@@ -1,1 +1,4 @@
-alert("Hello, world!");
+import "./cssreset.css";
+import "./style.css";
+
+console.log("Hello, world!");
