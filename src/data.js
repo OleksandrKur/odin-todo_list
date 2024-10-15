@@ -1,6 +1,7 @@
 import logger from "./logger";
 import { v4 as uuidv4 } from "uuid";
 
+
 export class Task {
   constructor(title, description, dueDate, priority, projectName) {
     this.title = title;
@@ -45,7 +46,7 @@ export class Storage {
     logger.log(`${projectName} project was deleted`);
     project.tasks.length = 0;
   }
-  removeTask(taskUuid) {
+  removeTaskFromStorage(taskUuid) {
     for (const [key, value] of Object.entries(this.storage)) {
       if (Object.hasOwn(this.storage[key].tasks, taskUuid)) {
         delete this.storage[key].tasks[taskUuid];
@@ -53,8 +54,12 @@ export class Storage {
         return;
       }
     }
+
     logger.log(`Failed to remove ${taskUuid}`);
     return;
+  }
+  getProjectByName(projectName){
+    return this.storage[projectName];
   }
 
 }
