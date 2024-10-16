@@ -1,3 +1,6 @@
+import addIcon from "./icons/add.svg";
+import deleteIcon from "./icons/delete.svg";
+
 class Display {
   renderWrapper(parent, className) {
     const wrapper = document.createElement("div");
@@ -19,6 +22,7 @@ class TasksDisplay extends Display {
     element.getAttribute("data-uuid");
     return element.value;
   }
+  //FIXME:
   renderTask(task, parentId, deleteFunction) {
     const tasksWrapper = document.getElementById(parentId);
     const taskWrapper = this.renderWrapper(tasksWrapper, "task-item");
@@ -44,9 +48,8 @@ class TasksDisplay extends Display {
 
   deleteTasks(parentId) {
     const tasksWrapper = document.getElementById(parentId);
-    while (tasksWrapper.firstChild) {
-      tasksWrapper.removeChild(tasksWrapper.lastChild);
-    }
+
+    tasksWrapper.innerHTML = "";
   }
 }
 
@@ -61,30 +64,35 @@ class ProjectsDisplay extends Display {
       project.name
     );
     projectHeading.setAttribute("data-projectname", project.name);
-    renderControlElement(projectWrapper, project.name, "X", deleteFunction);
-    renderControlElement(projectWrapper, project.name, "+", addFunction);
+    //TODO:
+    renderControlElement(
+      projectWrapper,
+      project.name,
+      deleteIcon,
+      deleteFunction
+    );
+    renderControlElement(projectWrapper, project.name, addIcon, addFunction);
 
     return projectWrapper;
 
     function renderControlElement(parent, name, icon, func) {
       const element = document.createElement("a");
-      element.textContent = icon;
+      const img = document.createElement("img");
+      img.setAttribute("src", icon);
+      img.classList.add("project-icon");
       element.classList.add("control-icon");
       element.setAttribute("data-projectname", name);
       parent.appendChild(element);
+      element.append(img);
       element.addEventListener("click", (event) => {
-        func();
+        //TODO:
+        func(event);
       });
       return element;
     }
   }
   deleteProject(element) {
     element.remove();
-  }
-
-  deleteTasks(parentId) {
-    const tasksWrapper = document.getElementById(parentId);
-    tasksWrapper.childNodes.forEach((element) => element.remove());
   }
 }
 

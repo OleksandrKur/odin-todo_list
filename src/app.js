@@ -15,31 +15,41 @@ class Controller {
 
   createProject(name, storage) {
     const project = new Project(name);
-    storage.addProject(project);
+    project.name = storage.addProject(project);
     let projectElement = projectsDisplay.renderProject(
       project,
       "projects",
       () => {
+        //TODO:
         this.removeProject(project, storage);
         projectsDisplay.deleteProject(projectElement);
       },
-      () => {
-        currentProjectName = event.target.getAttribute("data-projectname");
+      (event) => {
+        currentProjectName =
+          event.currentTarget.getAttribute("data-projectname");
         tasksFormHandler.showForm();
-        console.log(currentProjectName);
       }
     );
 
-    projectElement.addEventListener("click", () => {
-      tasksDisplay.deleteTasks("tasks");
-      controller.filterTasks(project, storage);
+    projectElement.addEventListener("click", (event) => {
+      if (event.target.classList.contains("project-name")) {
+        tasksDisplay.deleteTasks("tasks");
+        controller.filterTasks(project, storage);
+      }
     });
 
     return project;
   }
-
+  clearTasks() {
+    document.getElementById("tasks").innerHTML = "";
+  }
   removeProject(project, storage) {
-    storage.removeProject(project);
+    if (project.name === currentProjectName) {
+      storage.removeProject(project);
+      tasksDisplay.deleteTasks("tasks");
+    } else {
+      storage.removeProject(project);
+    }
   }
 
   createTask(title, description, dueDate, priority, project, storage) {
@@ -49,6 +59,7 @@ class Controller {
   }
 
   filterTasks(project, storage) {
+    tasksDisplay.deleteTasks("tasks");
     Object.keys(project.tasks).forEach((key) => {
       tasksDisplay.renderTask(project.tasks[key], "tasks", () =>
         this.removeTask(storage, project.tasks[key].uuid)
@@ -99,21 +110,26 @@ newTask = controller.createTask(
   defaultProject,
   newStorage
 );
-console.dir(newStorage);
 
+controller.filterTasks(newStorage.storage[currentProjectName], newStorage);
 //Add task
 document.getElementById("addtask-button").addEventListener("click", (event) => {
   event.preventDefault();
   let task = tasksFormHandler.getFormData();
-  controller.createTask(
-    task.title,
-    task.description,
-    task.dueDate,
-    task.priority,
-    newStorage.storage[currentProjectName],
-    newStorage
-  );
-  tasksFormHandler.hideForm();
+  if (task) {
+    controller.createTask(
+      task.title,
+      task.description,
+      task.dueDate,
+      task.priority,
+      newStorage.storage[currentProjectName],
+      newStorage
+    );
+  }
+  if (task) {
+    controller.filterTasks(newStorage.storage[currentProjectName], newStorage);
+    tasksFormHandler.hideForm();
+  }
 });
 
 //Add project
@@ -122,11 +138,11 @@ document
   .addEventListener("click", (event) => {
     event.preventDefault();
     let project = projectsFormHandler.getFormData();
-    controller.createProject(project.name, newStorage);
-    projectsFormHandler.hideForm();
+    if (project) {
+      controller.createProject(project.name, newStorage);
+      projectsFormHandler.hideForm();
+    }
   });
-
-console.log(controller.listTasks(newStorage));
 
 //Make forms modals closable
 document.addEventListener("click", (event) => {

@@ -1,7 +1,6 @@
 import logger from "./logger";
 import { v4 as uuidv4 } from "uuid";
 
-
 export class Task {
   constructor(title, description, dueDate, priority, projectName) {
     this.title = title;
@@ -36,9 +35,20 @@ export class Storage {
     this.storage = {};
   }
   addProject(project) {
-    const projectName = project.name;
-    this.storage[projectName] = project;
-    logger.log(`${this.storage[projectName].name} project was added`);
+    let projectName = project.name;
+    if (!this.storage.hasOwnProperty(projectName)) {
+      this.storage[projectName] = project;
+      logger.log(`${this.storage[projectName].name} project was added`);
+    } else {
+      let i = 1;
+      while (this.storage.hasOwnProperty(projectName + `(${i})`)) {
+        i++;
+      }
+      projectName = projectName + `(${i})`;
+      this.storage[projectName] = project;
+    }
+    console.log(this.storage);
+    return projectName;
   }
   removeProject(project) {
     const projectName = project.name;
@@ -58,8 +68,7 @@ export class Storage {
     logger.log(`Failed to remove ${taskUuid}`);
     return;
   }
-  getProjectByName(projectName){
+  getProjectByName(projectName) {
     return this.storage[projectName];
   }
-
 }

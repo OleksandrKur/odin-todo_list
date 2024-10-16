@@ -4,54 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webpack template</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="projects">
-        <div class="project-list" id="projects">
+    <div class="page-wrapper">
+        <aside class="projects">
+            <button id="open-project-form-button"><div class="plus-sign">+</div>Add project</button>
+            <div class="project-list" id="projects">
+            </div>
+            
 
-        </div>
-        <button id="open-project-form-button">Add project</button>
-        <div class="form-wrapper hidden" id="projectsform-wrapper">
+
+
+            <dialog class="form-wrapper hidden" id="projectsform-wrapper">
+                <form class="add-form">
+                    <div class="input-item">
+                        <label for="name">Project name:</label>
+                        <input type="text" id="name" name="title">
+                    </div>
+                    <div class="input-item">
+                        <button type="submit" id="addproject-button">Add project</button>
+                    </div>
+                </form>
+            </dialog>
+
+        </aside>
+        <div class="form-wrapper hidden" id="taskform-wrapper">
             <form class="add-form">
                 <div class="input-item">
-                    <label for="name">Project name:</label>
-                    <input type="text" id="name" name="title">
+                    <label for="title">Task title:</label>
+                    <input type="text" id="title" name="title">
                 </div>
                 <div class="input-item">
-                    <button type="submit" id="addproject-button">Add project</button>
+                    <label for="description">Task description:</label>
+                    <textarea id="description" name="description"></textarea>
+                </div>
+                <div class="input-item">
+                    <label for="duedate">Due date:</label>
+                    <input type="date" id="duedate" name="duedate">
+                </div>
+                <div class="input-item">
+                    <label for="priority">Priority:</label>
+                    <select name="priority" id="priority">
+                        <option selected>Low</option>
+                        <option>Medium</option>
+                        <option>High</option>
+                        <option>Highest</option>
+                      </select>
+                </div>
+                <div class="input-item">
+                    <button type="submit" id="addtask-button">Add task</button>
                 </div>
             </form>
         </div>
+        <div id="tasks"></div>
     </div>
-    <div class="form-wrapper hidden" id="taskform-wrapper">
-        <form class="add-form">
-            <div class="input-item">
-                <label for="title">Task title:</label>
-                <input type="text" id="title" name="title">
-            </div>
-            <div class="input-item">
-                <label for="description">Task description:</label>
-                <textarea id="description" name="description"></textarea>
-            </div>
-            <div class="input-item">
-                <label for="duedate">Due date:</label>
-                <input type="date" id="duedate" name="duedate">
-            </div>
-            <div class="input-item">
-                <label for="priority">Priority:</label>
-                <select name="priority" id="priority">
-                    <option selected>Low</option>
-                    <option>Medium</option>
-                    <option>High</option>
-                    <option>Highest</option>
-                  </select>
-            </div>
-            <div class="input-item">
-                <button type="submit" id="addtask-button">Add task</button>
-            </div>
-        </form>
-    </div>
-
-    <div id="tasks"></div>
 </body>
 </html>

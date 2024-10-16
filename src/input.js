@@ -37,6 +37,10 @@ class TasksFormHandler extends FormHandler {
       const description = this.descriptionInput.value;
       const dueDate = this.dueDateInput.value;
       const priority = this.priorityInput.value;
+      this.titleInput.value = "";
+      this.descriptionInput.value = "";
+      this.dueDateInput.value = "";
+      this.priorityInput.value = "";
       return { title, description, dueDate, priority };
     } else alert("Please fill in all fields");
   }
@@ -48,6 +52,7 @@ class ProjectsFormHandler extends FormHandler {
   getFormData() {
     if (this.titleInput.value != "") {
       const name = this.titleInput.value;
+      this.titleInput.value = "";
       return { name };
     } else alert("Please fill in all fields");
   }
