@@ -4,6 +4,7 @@ import "./style.css";
 import { Storage, Project, Taks, Task } from "./data.js";
 import { tasksDisplay, projectsDisplay } from "./display.js";
 import { tasksFormHandler, projectsFormHandler } from "./input.js";
+import { format, compareAsc } from "date-fns";
 
 let currentProjectName = "Default";
 
@@ -53,18 +54,46 @@ class Controller {
   }
 
   createTask(title, description, dueDate, priority, project, storage) {
-    const task = new Task(title, description, dueDate, priority, project.name);
+    const task = new Task(
+      title,
+      description,
+      format(dueDate, "dd.MM.yyyy"),
+      priority,
+      project.name
+    );
     project.addTask(task);
     return task;
   }
 
   filterTasks(project, storage) {
+    let tasks = [];
     tasksDisplay.deleteTasks("tasks");
     Object.keys(project.tasks).forEach((key) => {
-      tasksDisplay.renderTask(project.tasks[key], "tasks", () =>
-        this.removeTask(storage, project.tasks[key].uuid)
-      );
+      tasks.push(project.tasks[key]);
     });
+    tasks.sort((a, b) => compareAsc(a.dueDate, b.dueDate));
+    tasks.forEach((task) =>
+      tasksDisplay.renderTask(task, "tasks", () =>
+        this.removeTask(storage, project.tasks[key].uuid)
+      )
+    );
+  }
+
+  filterAllTasks(storage) {
+    tasksDisplay.deleteTasks("tasks");
+    let tasks = [];
+    Object.keys(storage.storage).forEach((project) => {
+      Object.keys(storage.storage[project].tasks).forEach((task) => {
+        tasks.push(storage.storage[project].tasks[task]);
+      });
+    });
+    tasks.sort((a, b) => compareAsc(a.dueDate, b.dueDate));
+    console.log(tasks);
+    tasks.forEach((task) =>
+      tasksDisplay.renderTask(task, "tasks", () =>
+        this.removeTask(storage, project.tasks[key].uuid)
+      )
+    );
   }
 
   removeTask(storage, taskUuid) {
@@ -87,7 +116,7 @@ let defaultProject = controller.createProject("Default", newStorage);
 let newTask = controller.createTask(
   "Wash dishes",
   "I have to wash dishes",
-  "12.10.2021",
+  "2024-10-17",
   "Top",
   defaultProject,
   newStorage
@@ -96,7 +125,7 @@ let newTask = controller.createTask(
 newTask = controller.createTask(
   "Make Todo Project",
   "Finish project by monday",
-  "13.10.2021",
+  "2024-10-13",
   "High",
   defaultProject,
   newStorage
@@ -105,7 +134,7 @@ newTask = controller.createTask(
 newTask = controller.createTask(
   "Design Todo page",
   "Finish project by monday",
-  "11.10.2021",
+  "2024-11-10",
   "Top",
   defaultProject,
   newStorage
@@ -157,3 +186,6 @@ document
   .addEventListener("click", (event) => {
     projectsFormHandler.showForm();
   });
+document
+  .getElementById("all-projects")
+  .addEventListener("click", () => controller.filterAllTasks(newStorage));

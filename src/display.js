@@ -24,6 +24,10 @@ class TasksDisplay extends Display {
   }
   //FIXME:
   renderTask(task, parentId, deleteFunction) {
+    if (!task) {
+      console.log("cannot render task");
+      return;
+    }
     const tasksWrapper = document.getElementById(parentId);
     const taskWrapper = this.renderWrapper(tasksWrapper, "task-item");
     this.renderElement(taskWrapper, "p", "task-title", task.title);
