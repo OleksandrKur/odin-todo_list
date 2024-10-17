@@ -17,22 +17,12 @@ export class Project {
     this.name = name;
     this.tasks = {};
   }
-  addTask(task) {
-    const taskUuid = task.uuid;
-    this.tasks[taskUuid] = task;
-    logger.log(
-      `${this.tasks[taskUuid].title} was added to ${this.name} project`
-    );
-  }
-  removeTask(taskName) {
-    delete this.tasks[taskTitle]();
-    logger.log(`${taskName} was removed from ${this.name} project`);
-  }
+
 }
 
 export class Storage {
-  constructor() {
-    this.storage = {};
+  constructor(storage) {
+    this.storage = storage;
   }
   addProject(project) {
     let projectName = project.name;
@@ -70,5 +60,14 @@ export class Storage {
   }
   getProjectByName(projectName) {
     return this.storage[projectName];
+  }
+  addTask(project, task) {
+    const taskUuid = task.uuid;
+    this.storage[project.name].tasks[taskUuid] = task;
+
+  }
+  removeTask(project, taskName) {
+    delete this.storage[project.name].tasks[taskName]();
+
   }
 }

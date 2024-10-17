@@ -11,7 +11,7 @@ class Display {
   renderElement(parent, elementName, className, value) {
     const element = document.createElement(elementName);
     element.textContent = value;
-    element.classList.add(className);
+    element.classList.add(...className.split(" "));
     parent.appendChild(element);
     return element;
   }
@@ -32,8 +32,13 @@ class TasksDisplay extends Display {
     const taskWrapper = this.renderWrapper(tasksWrapper, "task-item");
     this.renderElement(taskWrapper, "p", "task-title", task.title);
     this.renderElement(taskWrapper, "p", "task-description", task.description);
-    this.renderElement(taskWrapper, "p", "task-dueDate", task.dueDate);
-    this.renderElement(taskWrapper, "p", "task-priority", task.priority);
+    this.renderElement(taskWrapper, "p", `task-dueDate`, task.dueDate);
+    this.renderElement(
+      taskWrapper,
+      "p",
+      `task-priority ${task.priority.toLowerCase()}`,
+      task.priority
+    );
     renderDeleteElement(taskWrapper, task.uuid, deleteFunction);
 
     function renderDeleteElement(parent, uuid, deleteFunction) {

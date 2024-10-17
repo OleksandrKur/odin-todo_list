@@ -10,10 +10,45 @@ let currentProjectName = "Default";
 
 class Controller {
   createStorage() {
-    const storage = new Storage();
+    let storage;
+    if (!localStorage.getItem("tasksStorage")) {
+      storage = new Storage({});
+      this.createProject("Default", storage);
+    } else {
+      let lclstorage = JSON.parse(localStorage.getItem("tasksStorage"));
+      storage = new Storage(lclstorage);
+      Object.keys(storage.storage).forEach((key) => {
+        let projectElement = projectsDisplay.renderProject(
+          storage.storage[key],
+          "projects",
+          () => {
+            this.removeProject(storage.storage[key], storage);
+            projectsDisplay.deleteProject(projectElement);
+          },
+          (event) => {
+            console.log(event.currentTarget.getAttribute("data-projectname"));
+            console.log(storage);
+            currentProjectName =
+              event.currentTarget.getAttribute("data-projectname");
+            tasksFormHandler.showForm();
+          }
+        );
+
+        projectElement.addEventListener("click", (event) => {
+          if (event.target.classList.contains("project-name")) {
+            tasksDisplay.deleteTasks("tasks");
+            controller.filterTasks(storage.storage[key], storage);
+          }
+        });
+      });
+    }
+
     return storage;
   }
-
+  saveStorage(storage) {
+    let storageJSON = JSON.stringify(storage);
+    localStorage.setItem("tasksStorage", storageJSON);
+  }
   createProject(name, storage) {
     const project = new Project(name);
     project.name = storage.addProject(project);
@@ -21,7 +56,6 @@ class Controller {
       project,
       "projects",
       () => {
-        //TODO:
         this.removeProject(project, storage);
         projectsDisplay.deleteProject(projectElement);
       },
@@ -38,7 +72,7 @@ class Controller {
         controller.filterTasks(project, storage);
       }
     });
-
+    this.saveStorage(storage.storage);
     return project;
   }
   clearTasks() {
@@ -51,6 +85,7 @@ class Controller {
     } else {
       storage.removeProject(project);
     }
+    this.saveStorage(storage.storage);
   }
 
   createTask(title, description, dueDate, priority, project, storage) {
@@ -61,7 +96,8 @@ class Controller {
       priority,
       project.name
     );
-    project.addTask(task);
+    storage.addTask(project, task);
+    this.saveStorage(storage.storage);
     return task;
   }
 
@@ -74,7 +110,7 @@ class Controller {
     tasks.sort((a, b) => compareAsc(a.dueDate, b.dueDate));
     tasks.forEach((task) =>
       tasksDisplay.renderTask(task, "tasks", () =>
-        this.removeTask(storage, project.tasks[key].uuid)
+        this.removeTask(storage, task.uuid)
       )
     );
   }
@@ -82,22 +118,35 @@ class Controller {
   filterAllTasks(storage) {
     tasksDisplay.deleteTasks("tasks");
     let tasks = [];
-    Object.keys(storage.storage).forEach((project) => {
-      Object.keys(storage.storage[project].tasks).forEach((task) => {
-        tasks.push(storage.storage[project].tasks[task]);
+    if (Object.keys(storage.storage).length > 0) {
+      Object.keys(storage.storage).forEach((project) => {
+        if (
+          storage.storage[project].tasks &&
+          Object.keys(storage.storage[project].tasks).length > 0
+        ) {
+          Object.keys(storage.storage[project].tasks).forEach((task) => {
+            tasks.push(storage.storage[project].tasks[task]);
+          });
+        } else {
+          console.log(`No tasks found for project: ${project}`);
+        }
       });
-    });
+    } else {
+      console.log("No projects found.");
+    }
+
     tasks.sort((a, b) => compareAsc(a.dueDate, b.dueDate));
     console.log(tasks);
     tasks.forEach((task) =>
       tasksDisplay.renderTask(task, "tasks", () =>
-        this.removeTask(storage, project.tasks[key].uuid)
+        this.removeTask(storage, task.uuid)
       )
     );
   }
 
   removeTask(storage, taskUuid) {
     storage.removeTaskFromStorage(taskUuid);
+    this.saveStorage(storage.storage);
   }
 
   listTasks(storage) {
@@ -112,35 +161,7 @@ class Controller {
 const controller = new Controller();
 const newStorage = controller.createStorage();
 
-let defaultProject = controller.createProject("Default", newStorage);
-let newTask = controller.createTask(
-  "Wash dishes",
-  "I have to wash dishes",
-  "2024-10-17",
-  "Top",
-  defaultProject,
-  newStorage
-);
-
-newTask = controller.createTask(
-  "Make Todo Project",
-  "Finish project by monday",
-  "2024-10-13",
-  "High",
-  defaultProject,
-  newStorage
-);
-
-newTask = controller.createTask(
-  "Design Todo page",
-  "Finish project by monday",
-  "2024-11-10",
-  "Top",
-  defaultProject,
-  newStorage
-);
-
-controller.filterTasks(newStorage.storage[currentProjectName], newStorage);
+controller.filterAllTasks(newStorage);
 //Add task
 document.getElementById("addtask-button").addEventListener("click", (event) => {
   event.preventDefault();
